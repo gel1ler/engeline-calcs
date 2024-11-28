@@ -7,13 +7,6 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   color: var(--foreground);
   background: var(--background);
@@ -24,4 +17,67 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+h3 {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+h4 {
+  font-size: 18px;
+  /* font-weight: bold; */
+}
+
+h5 {
+  font-size: 16px;
+}
+
+.main-block {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+}
+
+.shadowed {
+  box-shadow: 0 0 5px 3px rgba(0, 0, 0, 0.1);
+}
+
+.menu {
+  padding: 20px;
+  border-radius: 20px;
+  overflow-y: scroll;
+}
+
+.dropdown-btn {
+  font-size: 20px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dropdown-btn.opened {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  opacity: 0.2;
+  height: auto;
+  padding-left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dropdown.opened {
+  max-height: 150px;
+  opacity: 1;
+}
+
+.dropdown.hovered {
+  position: relative;
+  max-height: 15px;
 }
