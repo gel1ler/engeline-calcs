@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 
 const Dropdown = ({ title, items, categoryId }: { title: string, items: any[], categoryId: number }) => {
   const [open, setOpen] = useState<boolean>(false)
-  const [hover, setHover] = useState<boolean>(false)
   const router = useRouter()
 
   const setProduct = (item: any) => {
@@ -16,13 +15,11 @@ const Dropdown = ({ title, items, categoryId }: { title: string, items: any[], c
       <div
         className='flex justify-between items-center cursor-pointer'
         onClick={() => setOpen(!open)}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
       >
         <h4>{title}</h4>
         <button className={`dropdown-btn ${open ? 'opened' : ''}`}>+</button>
       </div>
-      <div className={`dropdown ${open ? 'opened mt-2' : ''} ${hover && !open ? 'hovered' : ''}`}>
+      <div className={`dropdown ${open ? 'opened mt-2' : ''}`}>
         {items.map(item =>
           <h5
             key={item.id}

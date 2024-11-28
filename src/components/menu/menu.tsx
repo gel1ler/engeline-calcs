@@ -2,7 +2,7 @@ import React from 'react'
 import Dropdown from './dropdown'
 import { Category, Product } from '../../../globalTypes';
 
-const List = ({ products, categories }: { products: Product[], categories: Category[] }) => {
+const Menu = ({ products, categories }: { products: Product[], categories: Category[] }) => {
     const groupedProducts = products.reduce((acc: { [key: number]: { id: number, title: string, items: Product[] } }, product) => {
         if (!acc[product.category]) {
             acc[product.category] = {
@@ -19,7 +19,7 @@ const List = ({ products, categories }: { products: Product[], categories: Categ
     const arr = Object.values(groupedProducts);
 
     return (
-        <div className='flex flex-col gap-2'>
+        <div className='flex flex-col gap-3 menu'>
             <h3>Меню</h3>
             {arr.map((item, key) => (
                 <div key={item.id} >
@@ -31,4 +31,4 @@ const List = ({ products, categories }: { products: Product[], categories: Categ
     )
 }
 
-export default List
+export default Menu

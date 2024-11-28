@@ -1,5 +1,5 @@
 import Image from "next/image";
-import List from "../components/list/list";
+import Menu from "../components/menu/menu";
 import SearchInput from "../components/search";
 import categories from "@/../data/categories.json";
 import products from "@/../data/products.json";
@@ -12,25 +12,25 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="flex flex-col gap-8 p-4 h-screen">
+    <main className="flex flex-col gap-8 p-4 min-h-screen">
       <header className='flex justify-between px-8'>
         <Image
           src="/logo/logo-horizontal.svg"
           alt='Logo'
-          width={250}
-          height={100}
+          width={300}
+          height={43}
         />
         <Image
           src="/icons/help.svg"
+          className="aspect-square"
           alt='Help'
           width={25}
           height={25}
         />
       </header>
       <div className="main-block px-10">
-        <div className="menu shadowed">
-          <List products={products} categories={categories} />
-        </div>
+        <Menu products={products} categories={categories} />
+        <div className="v_divider ml-1" />
         <div className="flex flex-col w-full h-full">
           <SearchInput products={products} />
           <Wrapper />
