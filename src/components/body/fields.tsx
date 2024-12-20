@@ -6,7 +6,9 @@ import { formatNumber } from '@/services'
 import Input from './input'
 import ExcelJS from 'exceljs';
 
-const Fields = ({ units, name, data }: { units: string, name: string, data: any[] }) => {
+
+const Fields = ({ product, units }: { product: any, units: string }) => {
+    const { name, select } = product
     const [opened, setOpened] = useState(false)
 
     //Default consts
@@ -20,6 +22,7 @@ const Fields = ({ units, name, data }: { units: string, name: string, data: any[
     const [plan, setPlan] = useState(10)
 
 
+    const [selected, setSelected] = useState<string | null>(null)
     const [diam, setDiam] = useState<number | null>(1020)
     const [thickness, setThickness] = useState<number | null>(10)
     const [weldingMaterialsCost, setWeldingMaterialsCost] = useState(1000);
@@ -180,6 +183,21 @@ const Fields = ({ units, name, data }: { units: string, name: string, data: any[
 
     return (
         <div className='flex flex-col gap-4 mt-4 h-full'>
+            {select ? (
+                <select
+                    className="border border-gray-400 rounded-md p-2 transition duration-150 ease-in-out w-fit"
+                    value={selected ? selected : ''}
+                    onChange={(e) => setSelected(e.target.value)}
+                >
+                    <option value="">Выберите {name}</option>
+                    {select.map((coupling: string, index: number) => (
+                        <option key={index} value={coupling}>
+                            {coupling}
+                        </option>
+                    ))}
+                </select>
+            ) : null}
+
             <div className="flex gap-4">
                 {diam === null ? null : <Input placeholder='Диаметр, мм' value={diam} setValue={setDiam} />}
                 {thickness === null ? null : <Input placeholder='Толщина, мм' value={thickness} setValue={setThickness} />}

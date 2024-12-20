@@ -54,7 +54,6 @@ h5 {
 .menu {
   padding: 10px;
   overflow-y: auto;
-  max-height: 85vh;
 }
 
 .dropdown-btn {
@@ -78,8 +77,8 @@ h5 {
 }
 
 .dropdown.opened {
-  max-height: 150px;
   opacity: 1;
+  max-height: 1000px;
 }
 
 .dropdown.hovered {

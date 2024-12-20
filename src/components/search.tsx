@@ -21,7 +21,7 @@ const SearchInput = ({ products }: { products: Product[] }) => {
 
     if (value.length > 0) {
       const filteredSuggestions = products.filter(item =>
-        item.name.toLowerCase().slice(0, value.length) === value.toLowerCase()
+        item.name.toLowerCase().includes(value.toLowerCase())
       );
       setSuggestions(filteredSuggestions);
     } else {
