@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { tableType } from '../../../globalTypes';
-import { formatNumber, parseNumber } from '@/services';
+import React, { LegacyRef, useEffect } from 'react'
+import { CalculationSetters, CalculationStates, tableType } from '../../../globalTypes';
+import { formatNumber } from '@/services';
 import { NumericFormat } from 'react-number-format';
 
-const EdditableCell = ({ item }: { item: any }) => {
+type itemType = { id: number; name: string; cost: number; setCost?: (value: number) => void; NDS?: boolean; bold?: boolean; }
+
+const EdditableCell = ({ item }: { item: itemType }) => {
     return (
         <td className=" break-words text-center relative">
             {item.setCost ? (
@@ -13,7 +15,7 @@ const EdditableCell = ({ item }: { item: any }) => {
                         allowNegative={false}
                         value={item.cost}
                         onValueChange={values => {
-                            item.setCost(Number(values.value))
+                            item.setCost!(Number(values.value))
                         }}
                         placeholder="Введите значение"
                         prefix="₽ "
@@ -31,29 +33,38 @@ const EdditableCell = ({ item }: { item: any }) => {
 }
 
 const Table = ({
-    materialCost, scrapRate, sellPrice, netProfit, setNetProfit, tableRef, states, genContractorNDS, units, scrap
+    materialCost, scrapRate, sellPrice, setNetProfit, tableRef, states, setters, genContractorNDS, units, scrap
 }: {
-    materialCost: number, scrapRate: number, sellPrice: number, netProfit: number, setNetProfit: (value: number) => void, tableRef: any, states: any, genContractorNDS?: boolean, units: string, scrap?: boolean
+    materialCost: number,
+    scrapRate: number,
+    sellPrice: number,
+    setNetProfit: (value: number) => void,
+    tableRef: LegacyRef<HTMLTableElement> | undefined,
+    states: CalculationStates,
+    setters: CalculationSetters,
+    genContractorNDS?: boolean,
+    units: string,
+    scrap?: boolean
 }) => {
 
     // Table data
     const initTableData: (tableType | null)[] = [
         // Materials
         { name: 'Основные материалы:', cost: materialCost, NDS: true },
-        states.weldingMaterialsCost !== undefined ? { name: 'Сварочные материалы:', cost: states.weldingMaterialsCost, setCost: states.setWeldingMaterialsCost, NDS: true } : null,
+        states.weldingMaterialsCost !== undefined ? { name: 'Сварочные материалы:', cost: states.weldingMaterialsCost, setCost: setters.setWeldingMaterialsCost, NDS: true } : null,
 
         // Salary and salary taxes
-        states.mainWorkersSalary !== undefined ? { name: 'Основная з/п рабочих', cost: states.mainWorkersSalary, setCost: states.setMainWorkersSalary } : null,
-        { name: 'Налоги на з/п рабочих', cost: Math.round(states.mainWorkersSalary * 0.35) },
-        { name: 'З/п ИТР', cost: Math.round(states.mainWorkersSalary * 0.5) },
-        { name: 'Налоги на з/п ИТР', cost: Math.round(states.mainWorkersSalary * 0.5 * 0.35) },
+        states.mainWorkersSalary !== undefined ? { name: 'Основная з/п рабочих', cost: states.mainWorkersSalary, setCost: setters.setMainWorkersSalary } : null,
+        { name: 'Налоги на з/п рабочих', cost: Math.round(states.mainWorkersSalary ? states.mainWorkersSalary * 0.35 : 0) },
+        { name: 'З/п ИТР', cost: Math.round(states.mainWorkersSalary ? states.mainWorkersSalary * 0.5 : 0) },
+        { name: 'Налоги на з/п ИТР', cost: Math.round(states.mainWorkersSalary ? states.mainWorkersSalary * 0.5 * 0.35 : 0) },
 
         // Overheads
-        states.subOperations !== undefined ? { name: 'Суб. подрядные операции', cost: states.subOperations, setCost: states.setSubOperations, NDS: true } : null,
-        states.overheads !== undefined ? { name: 'Накладные', cost: states.overheads, setCost: states.setOverheads } : null,
-        states.electricityCost !== undefined ? { name: 'Электроэнергия', cost: states.electricityCost, setCost: states.setElectricityCost, NDS: true } : null,
-        states.rentCost !== undefined ? { name: 'Аренда (обор. + цех)', cost: states.rentCost, setCost: states.setRentCost, NDS: true } : null,
-        states.genContractorInterest !== undefined ? { name: 'Генподрядные', cost: states.genContractorInterest, setCost: states.setGenContractorInterest, NDS: genContractorNDS } : null,
+        states.subOperations !== undefined ? { name: 'Суб. подрядные операции', cost: states.subOperations, setCost: setters.setSubOperations, NDS: true } : null,
+        states.overheads !== undefined ? { name: 'Накладные', cost: states.overheads, setCost: setters.setOverheads } : null,
+        states.electricityCost !== undefined ? { name: 'Электроэнергия', cost: states.electricityCost, setCost: setters.setElectricityCost, NDS: true } : null,
+        states.rentCost !== undefined ? { name: 'Аренда (обор. + цех)', cost: states.rentCost, setCost: setters.setRentCost, NDS: true } : null,
+        states.genContractorInterest !== undefined ? { name: 'Генподрядные', cost: states.genContractorInterest, setCost: setters.setGenContractorInterest, NDS: genContractorNDS } : null,
 
         //
         scrap ? { name: 'Отходы (лом)', cost: materialCost * scrapRate, NDS: true } : null,

@@ -1,15 +1,15 @@
 'use client'
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import { Product } from '../../globalTypes';
+import { TProduct } from '../../globalTypes';
 
-const SearchInput = ({ products }: { products: Product[] }) => {
+const SearchInput = ({ products }: { products: TProduct[] }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [suggestions, setSuggestions] = useState<Product[]>([]);
+  const [suggestions, setSuggestions] = useState<TProduct[]>([]);
   const [selected, setSelected] = useState(-1);
   const router = useRouter();
 
-  const setProduct = (item: Product) => {
+  const setProduct = (item: TProduct) => {
     setSearchTerm('')
     setSuggestions([])
     router.replace(`?product=${String(item.category) + item.id}`);
@@ -30,10 +30,13 @@ const SearchInput = ({ products }: { products: Product[] }) => {
   };
 
   const moveTrigger = (code: string) => {
-
-    code === 'ArrowDown' && setSelected(prev => Math.min(prev + 1, suggestions.length - 1))
-    code === 'ArrowUp' && setSelected(prev => Math.max(prev - 1, -1))
-  }
+    if (code === 'ArrowDown') {
+      setSelected(prev => Math.min(prev + 1, suggestions.length - 1));
+    }
+    if (code === 'ArrowUp') {
+      setSelected(prev => Math.max(prev - 1, -1));
+    }
+  };
 
   return (
     <div

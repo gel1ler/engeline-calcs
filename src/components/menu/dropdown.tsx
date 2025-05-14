@@ -1,12 +1,13 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
+import { TProduct } from '../../../globalTypes'
 
-const Dropdown = ({ title, items, categoryId }: { title: string, items: any[], categoryId: number }) => {
+const Dropdown = ({ title, items, categoryId }: { title: string, items: TProduct[], categoryId: number }) => {
   const [open, setOpen] = useState<boolean>(false)
   const router = useRouter()
 
-  const setProduct = (item: any) => {
+  const setProduct = (item: string) => {
     router.replace(`?product=${item}`)
   }
 

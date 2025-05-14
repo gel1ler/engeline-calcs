@@ -4,7 +4,7 @@ import { NumericFormat } from 'react-number-format';
 const Input = ({
     placeholder, formated, value, setValue
 }: {
-    placeholder: string, formated?: boolean, value: any, setValue: (val: any) => void
+    placeholder: string, formated?: boolean, value: number, setValue: (val: number) => void
 }) => {
     return (
         <div className='w-full'>

@@ -1,14 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Modal from './modal'
-import { ConstsType } from '../../../globalTypes'
+import { CalculationSetters, CalculationStates, ConstsType, TProduct } from '../../../globalTypes'
 import Table from './table'
 import { formatNumber } from '@/services'
 import Input from './input'
 import ExcelJS from 'exceljs';
 
+interface TableRowData {
+    id: number;
+    name: string;
+    value: string | number;
+}
 
-const Fields = ({ product, units }: { product: any, units: string }) => {
-    const { name, select } = product
+const Fields = ({ product, units }: { product: TProduct, units: string }) => {
+    const { name } = product
     const [opened, setOpened] = useState(false)
 
     //Default consts
@@ -21,8 +26,6 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
     const [netProfit, setNetProfit] = useState(0)
     const [plan, setPlan] = useState(10)
 
-
-    const [selected, setSelected] = useState<string | null>(null)
     const [diam, setDiam] = useState<number | null>(1020)
     const [thickness, setThickness] = useState<number | null>(10)
     const [weldingMaterialsCost, setWeldingMaterialsCost] = useState(1000);
@@ -35,20 +38,29 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
     const [genContractorInterest, setGenContractorInterest] = useState<number>()
     const [genContractorNDS, setGenContractorNDS] = useState<boolean>(false)
 
-    const states: any = {
-        mainWorkersSalary, setMainWorkersSalary,
-        overheads, setOverheads,
-        electricityCost, setElectricityCost,
-        rentCost, setRentCost,
-        subOperations, setSubOperations,
-        genContractorInterest, setGenContractorInterest
-    }
+    const states: CalculationStates = useMemo(() => ({
+        mainWorkersSalary,
+        overheads,
+        electricityCost,
+        rentCost,
+        subOperations,
+        genContractorInterest,
+    }), [mainWorkersSalary, overheads, electricityCost, rentCost, subOperations, genContractorInterest]);
+
+    const setters: CalculationSetters = useMemo(() => ({
+        setMainWorkersSalary,
+        setOverheads,
+        setElectricityCost,
+        setRentCost,
+        setSubOperations,
+        setGenContractorInterest,
+    }), []);
 
     useEffect(() => {
         switch (name) {
             case 'Трубы обечаечные':
                 states.weldingMaterialsCost = weldingMaterialsCost;
-                states.setWeldingMaterialsCost = setWeldingMaterialsCost;
+                setters.setWeldingMaterialsCost = setWeldingMaterialsCost;
                 setScrap(true)
                 setDiam(1020)
                 setThickness(10)
@@ -63,7 +75,7 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
                 setSubOperations(0)
                 break;
         }
-    }, [name])
+    }, [name, states, setters, weldingMaterialsCost])
 
     const tableRef = useRef<HTMLTableElement>(null)
 
@@ -84,25 +96,25 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
         }
     ]
 
-    const extractTableData = () => {
+    const extractTableData = (): TableRowData[] => {
         const table = tableRef.current;
-        if (!table) return;
+        if (!table) return [];
 
         const rows = table.querySelectorAll('tbody tr');
-        const data: any = [];
+        const data: TableRowData[] = [];
 
         rows.forEach(row => {
             const cells = row.querySelectorAll('td');
-            const rowData = [
-                Number(cells[0].textContent?.trim()),
-                cells[1].textContent?.trim(),
-                cells[2].querySelector('input')?.value.trim() || cells[2].textContent?.trim(),
-            ];
+            const rowData: TableRowData = {
+                id: Number(cells[0].textContent?.trim()) || 0,
+                name: cells[1].textContent?.trim() || '',
+                value: cells[2].querySelector('input')?.value.trim() || cells[2].textContent?.trim() || ''
+            };
             data.push(rowData);
         });
 
         return data;
-    }
+    };
 
     const exportToExcel = () => {
         const data = extractTableData();
@@ -119,14 +131,14 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
             [''],
             ['Расчет'],
             ['№', "Наименование", `Стоимость за ${units}`],
-            ...data
+            ...data.map(item => [item.id, item.name, item.value])
         ];
 
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Sheet1');
 
         resData.forEach((row, rowIndex) => {
-            row.forEach((cell: any, cellIndex: number) => {
+            row.forEach((cell: (string | number | null), cellIndex: number) => {
                 worksheet.getCell(rowIndex + 1, cellIndex + 1).value = cell;
             });
 
@@ -183,21 +195,6 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
 
     return (
         <div className='flex flex-col gap-4 mt-4 h-full'>
-            {select ? (
-                <select
-                    className="border border-gray-400 rounded-md p-2 transition duration-150 ease-in-out w-fit"
-                    value={selected ? selected : ''}
-                    onChange={(e) => setSelected(e.target.value)}
-                >
-                    <option value="">Выберите {name}</option>
-                    {select.map((coupling: string, index: number) => (
-                        <option key={index} value={coupling}>
-                            {coupling}
-                        </option>
-                    ))}
-                </select>
-            ) : null}
-
             <div className="flex gap-4">
                 {diam === null ? null : <Input placeholder='Диаметр, мм' value={diam} setValue={setDiam} />}
                 {thickness === null ? null : <Input placeholder='Толщина, мм' value={thickness} setValue={setThickness} />}
@@ -213,7 +210,7 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
                         <input
                             type="checkbox"
                             checked={scrap}
-                            onChange={e => setScrap(!scrap)}
+                            onChange={() => setScrap(!scrap)}
                         />
                         <span className="slider round" />
                     </label>
@@ -225,7 +222,7 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
                         <input
                             type="checkbox"
                             checked={subOperations !== undefined}
-                            onChange={e => setSubOperations(subOperations === undefined ? 0 : undefined)}
+                            onChange={() => setSubOperations(subOperations === undefined ? 0 : undefined)}
                         />
                         <span className="slider round" />
                     </label>
@@ -237,7 +234,7 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
                         <input
                             type="checkbox"
                             checked={genContractorInterest !== undefined}
-                            onChange={e => setGenContractorInterest(genContractorInterest === undefined ? 0 : undefined)}
+                            onChange={() => setGenContractorInterest(genContractorInterest === undefined ? 0 : undefined)}
                         />
                         <span className="slider round" />
                     </label>
@@ -250,7 +247,7 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
                             <input
                                 type="checkbox"
                                 checked={genContractorNDS}
-                                onChange={e => setGenContractorNDS(!genContractorNDS)}
+                                onChange={() => setGenContractorNDS(!genContractorNDS)}
                             />
                             <span className="slider round" />
                         </label>
@@ -264,9 +261,9 @@ const Fields = ({ product, units }: { product: any, units: string }) => {
                     materialCost={price}
                     scrapRate={scrapRate}
                     sellPrice={sellPrice}
-                    netProfit={netProfit}
                     setNetProfit={setNetProfit}
                     states={states}
+                    setters={setters}
                     genContractorNDS={genContractorNDS}
                     units={units}
                     scrap={scrap}

@@ -5,6 +5,7 @@ import categories from "@/../data/categories.json";
 import products from "@/../data/products.json";
 import Wrapper from "@/components/body/wrapper";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: 'Расчет себестоимости продукции "ООО ИНЖЕЛАЙН"'
@@ -33,11 +34,13 @@ export default function Home() {
         <div className="v_divider ml-1" />
         <div className="flex flex-col w-full h-full">
           <SearchInput products={products} />
-          <Wrapper />
+          <Suspense>
+            <Wrapper />
+          </Suspense>
         </div>
       </div>
       <footer>
-        <p className="text-end text-gray-400">Расчет себестоимости продукции "ООО ИНЖЕЛАЙН"</p>
+        <p className="text-end text-gray-400">Расчет себестоимости продукции &quot;ООО ИНЖЕЛАЙН&quot;</p>
       </footer>
     </main>
   );

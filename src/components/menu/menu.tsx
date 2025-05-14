@@ -1,9 +1,9 @@
 import React from 'react'
 import Dropdown from './dropdown'
-import { Category, Product } from '../../../globalTypes';
+import { Category, TProduct } from '../../../globalTypes';
 
-const Menu = ({ products, categories }: { products: Product[], categories: Category[] }) => {
-    const groupedProducts = products.reduce((acc: { [key: number]: { id: number, title: string, items: Product[] } }, product) => {
+const Menu = ({ products, categories }: { products: TProduct[], categories: Category[] }) => {
+    const groupedProducts = products.reduce((acc: { [key: number]: { id: number, title: string, items: TProduct[] } }, product) => {
         if (!acc[product.category]) {
             acc[product.category] = {
                 id: product.category,
